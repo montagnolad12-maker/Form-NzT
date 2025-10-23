@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard NzT - Admin</title>
+<link rel="stylesheet" href="styles.css" />
+<script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script defer src="scripts.js"></script>
+</head>
+<body>
+<main class="container">
+<h1>Dashboard NzT</h1>
+
+<div id="auth">
+  <h2>Login Admin</h2>
+  <input id="email" placeholder="Email" />
+  <input id="password" placeholder="Senha" type="password" />
+  <button id="btnLogin">Entrar</button>
+  <button id="btnLogout" class="hidden">Sair</button>
+  <div id="authMsg"></div>
+</div>
+
+<section id="panel" class="hidden">
+  <h2>Inscrições</h2>
+  <div id="submissions"></div>
+</section>
+
+</main>
+</body>
+</html>
