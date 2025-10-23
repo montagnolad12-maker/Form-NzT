@@ -1,1 +1,37 @@
-<meta http-equiv="refresh" content="0; url=form.html">
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Formulário NzT</title>
+<link rel="stylesheet" href="styles.css" />
+<script defer src="scripts.js"></script>
+</head>
+<body>
+<main class="container">
+  <h1>Inscrição NzT</h1>
+  <form id="nzt-form">
+    <label>Nome:<input name="name" required /></label>
+    <label>Nick do Discord:<input name="discord" required /></label>
+    <label>Idade:<input name="age" type="number" min="6" max="120" required /></label>
+    <label>Horários disponíveis:<textarea name="availability" rows="3" required></textarea></label>
+    <label>Participa de calls?<select name="calls" required>
+      <option value="">-- escolha --</option>
+      <option value="Sim">Sim</option>
+      <option value="Não">Não</option>
+      <option value="Às vezes">Às vezes</option>
+    </select></label>
+    <label class="rules"><input name="agree" type="checkbox" required /> Li e aceito as regras da NzT</label>
+    <button type="submit">Enviar inscrição</button>
+  </form>
+
+  <div id="result" class="hidden"></div>
+
+  <hr />
+  <h2>Verificar status</h2>
+  <input id="checkId" placeholder="submissionId" />
+  <button id="btnCheck">Ver status</button>
+  <div id="statusResult" class="hidden"></div>
+</main>
+</body>
+</html>
