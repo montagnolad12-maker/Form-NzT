@@ -4,7 +4,6 @@ body {
     background-color: #121212;
     color: #e0e0e0;
 }
-
 .container {
     max-width: 700px;
     margin: auto;
@@ -13,17 +12,14 @@ body {
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
-
 h1, h2 {
     text-align: center;
     color: #ffcc00;
 }
-
 label {
     display: block;
     margin: 12px 0 6px;
 }
-
 input, textarea, select, button {
     width: 100%;
     padding: 10px;
@@ -33,26 +29,22 @@ input, textarea, select, button {
     color: #e0e0e0;
     margin-bottom: 10px;
 }
-
 input:focus, textarea:focus, select:focus {
     outline: 2px solid #ffcc00;
 }
-
 button {
     background-color: #ffcc00;
     color: #121212;
     cursor: pointer;
     font-weight: bold;
 }
-
 button:hover {
     background-color: #e6b800;
 }
-
 .hidden {
     display: none;
 }
-
-.rules {
-    font-size: 0.9em;
-}
+.rules { font-size: 0.9em; }
+.status-approved { color: #00ff00; }
+.status-rejected { color: #ff4444; }
+.status-pending { color: #ffff00; }
