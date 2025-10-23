@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Status NzT</title>
+<link rel="stylesheet" href="styles.css" />
+<script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<script defer src="scripts.js"></script>
+</head>
+<body>
+<main class="container">
+  <h1>Status da Inscrição NzT</h1>
+  <p>Cole seu <strong>submissionId</strong> abaixo para acompanhar o status:</p>
+  <input id="statusId" placeholder="submissionId" />
+  <button id="btnStatusCheck">Ver status</button>
+  <div id="statusDisplay" class="hidden"></div>
+</main>
+</body>
+</html>
