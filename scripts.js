@@ -1,132 +1,106 @@
-// ----- COLOQUE SUA CONFIG DO FIREBASE AQUI -----
-const firebaseConfig = {
-  apiKey: "REPLACE_WITH_YOUR_API_KEY",
-  authDomain: "REPLACE_WITH_YOUR_AUTH_DOMAIN",
-  projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
-  storageBucket: "REPLACE_WITH_YOUR_STORAGE_BUCKET",
-  messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
-  appId: "REPLACE_WITH_YOUR_APP_ID"
-};
+// Simula banco local
+let submissions = JSON.parse(localStorage.getItem('submissions') || '[]');
 
-if (!window.firebaseApp) {
-  firebase.initializeApp(firebaseConfig);
-  window.firebaseApp = firebase.app();
-}
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-function $id(id){ return document.getElementById(id); }
 function uidShort(){ return Math.random().toString(36).slice(2,9); }
-function genTicketCode(){ return Math.floor(100000 + Math.random()*900000).toString(); }
 
-// ----------------- FORMULÁRIO -----------------
-if($id('nzt-form')){
-  const form = $id('nzt-form');
-  const result = $id('result');
-  const checkId = $id('checkId');
-  const btnCheck = $id('btnCheck');
-  const statusResult = $id('statusResult');
-
-  form.addEventListener('submit', async e=>{
+// --------- FORMULÁRIO ---------
+const form = document.getElementById('nzt-form');
+const result = document.getElementById('result');
+if(form){
+  form.addEventListener('submit', e=>{
     e.preventDefault();
     const data = {
+      id: uidShort(),
       name: form.name.value.trim(),
       discord: form.discord.value.trim(),
-      age: parseInt(form.age.value,10),
+      age: form.age.value,
       availability: form.availability.value.trim(),
       calls: form.calls.value,
-      agree: !!form.agree.checked,
-      status:'pending',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      status: 'pending',
+      ticketCode: ''
     };
-    try{
-      const docRef = await db.collection('submissions').add(data);
-      result.classList.remove('hidden');
-      result.innerHTML=`Inscrição enviada! Seu submissionId é: <code>${docRef.id}</code>`;
-    }catch(err){ console.error(err); result.classList.remove('hidden'); result.textContent='Erro ao enviar.'; }
+    submissions.push(data);
+    localStorage.setItem('submissions', JSON.stringify(submissions));
+    result.classList.remove('hidden');
+    result.innerHTML=`Inscrição enviada! Seu submissionId é: <code>${data.id}</code>`;
+    form.reset();
   });
+}
 
+// --------- STATUS ---------
+const btnCheck = document.getElementById('btnCheck');
+const statusResult = document.getElementById('statusResult');
+if(btnCheck){
   btnCheck.addEventListener('click', ()=>{
-    const id = checkId.value.trim();
-    if(!id) return alert('Cole seu submissionId');
-    db.collection('submissions').doc(id).onSnapshot(doc=>{
-      if(!doc.exists){ statusResult.classList.remove('hidden'); statusResult.textContent='ID não encontrado'; return; }
-      const d = doc.data();
-      statusResult.classList.remove('hidden');
-      if(d.status==='pending') statusResult.textContent='Seu formulário está em análise pela NzT...';
-      else if(d.status==='approved') statusResult.innerHTML=`Você foi aprovado na NzT!<br>Abra um ticket no nosso Discord: <a href="https://discord.gg/XnkKDrhwAs" target="_blank">Discord NzT</a><br>Senha: <strong>${d.ticketCode}</strong>`;
-      else statusResult.textContent='Infelizmente você não foi aprovado desta vez.';
-    });
+    const id = document.getElementById('checkId').value.trim();
+    const sub = submissions.find(s=>s.id===id);
+    statusResult.classList.remove('hidden');
+    if(!sub) statusResult.textContent='ID não encontrado';
+    else if(sub.status==='pending') statusResult.textContent='Seu formulário está em análise pela NzT...';
+    else if(sub.status==='approved') statusResult.innerHTML=`Você foi aprovado! Abra um ticket no Discord: <a href="https://discord.gg/XnkKDrhwAs" target="_blank">Discord NzT</a><br>Senha: <strong>${sub.ticketCode}</strong>`;
+    else statusResult.textContent='Infelizmente você não foi aprovado desta vez.';
   });
 }
 
-// ----------------- DASHBOARD -----------------
-if($id('btnLogin')){
-  const emailI = $id('email');
-  const passI = $id('password');
-  const btnLogin = $id('btnLogin');
-  const btnLogout = $id('btnLogout');
-  const authMsg = $id('authMsg');
-  const panel = $id('panel');
-  const submissionsDiv = $id('submissions');
+// --------- DASHBOARD ---------
+const loginDiv = document.getElementById('loginDiv');
+const panel = document.getElementById('panel');
+const submissionsDiv = document.getElementById('submissions');
+const loginMsg = document.getElementById('loginMsg');
+const btnLogin = document.getElementById('btnLogin');
+const btnLogout = document.getElementById('btnLogout');
 
-  btnLogin.addEventListener('click', async ()=>{
-    try{
-      await auth.signInWithEmailAndPassword(emailI.value, passI.value);
-    }catch(err){ authMsg.textContent=err.message; }
-  });
-
-  btnLogout.addEventListener('click', ()=>{ auth.signOut(); });
-
-  auth.onAuthStateChanged(async user=>{
-    if(user){
-      authMsg.textContent=`Logado como ${user.email}`;
-      btnLogout.classList.remove('hidden');
-      btnLogin.classList.add('hidden');
-      emailI.classList.add('hidden'); passI.classList.add('hidden');
+if(btnLogin){
+  btnLogin.addEventListener('click', ()=>{
+    const user = document.getElementById('user').value;
+    const pass = document.getElementById('pass').value;
+    if(user==='NzLobo' && pass==='Lobo1234'){
+      loginDiv.classList.add('hidden');
       panel.classList.remove('hidden');
-
-      // Load submissions
-      db.collection('submissions').orderBy('createdAt','desc').onSnapshot(snapshot=>{
-        submissionsDiv.innerHTML='';
-        snapshot.forEach(doc=>{
-          const d = doc.data();
-          const div = document.createElement('div');
-          div.style.border='1px solid #ffcc00'; div.style.padding='8px'; div.style.margin='8px 0'; div.style.borderRadius='8px';
-          div.innerHTML=`
-            <strong>ID:</strong> ${doc.id}<br>
-            <strong>Nome:</strong> ${d.name}<br>
-            <strong>Discord:</strong> ${d.discord}<br>
-            <strong>Idade:</strong> ${d.age}<br>
-            <strong>Disponibilidade:</strong> ${d.availability}<br>
-            <strong>Calls:</strong> ${d.calls}<br>
-            <strong>Status:</strong> ${d.status}<br>
-            <button onclick="approve('${doc.id}')">Aprovar</button>
-            <button onclick="reject('${doc.id}')">Reprovar</button>
-          `;
-          submissionsDiv.appendChild(div);
-        });
-      });
-
-    }else{
-      authMsg.textContent='Não logado';
-      panel.classList.add('hidden');
-      btnLogout.classList.add('hidden');
-      btnLogin.classList.remove('hidden');
-      emailI.classList.remove('hidden'); passI.classList.remove('hidden');
-    }
+      renderSubmissions();
+    }else loginMsg.textContent='Usuário ou senha incorretos';
   });
 }
 
-// ----------------- FUNÇÕES DE APROVAR/REPROVAR -----------------
-async function approve(docId){
-  const ticket = genTicketCode();
-  await db.collection('submissions').doc(docId).update({status:'approved', ticketCode: ticket});
-  alert(`Aprovado! Ticket gerado: ${ticket}`);
+if(btnLogout){
+  btnLogout.addEventListener('click', ()=>{
+    panel.classList.add('hidden');
+    loginDiv.classList.remove('hidden');
+  });
 }
 
-async function reject(docId){
-  await db.collection('submissions').doc(docId).update({status:'rejected'});
-  alert('Reprovado!');
+function renderSubmissions(){
+  submissionsDiv.innerHTML='';
+  submissions.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.style.border='1px solid #ffcc00';
+    div.style.padding='8px';
+    div.style.margin='8px 0';
+    div.style.borderRadius='8px';
+    div.innerHTML=`
+      <strong>ID:</strong> ${s.id}<br>
+      <strong>Nome:</strong> ${s.name}<br>
+      <strong>Discord:</strong> ${s.discord}<br>
+      <strong>Idade:</strong> ${s.age}<br>
+      <strong>Disponibilidade:</strong> ${s.availability}<br>
+      <strong>Calls:</strong> ${s.calls}<br>
+      <strong>Status:</strong> <span class="status-${s.status}">${s.status}</span><br>
+      <button onclick="approve(${i})">Aprovar</button>
+      <button onclick="reject(${i})">Reprovar</button>
+    `;
+    submissionsDiv.appendChild(div);
+  });
+}
+
+function approve(i){
+  submissions[i].status='approved';
+  submissions[i].ticketCode=Math.floor(100000+Math.random()*900000);
+  localStorage.setItem('submissions', JSON.stringify(submissions));
+  renderSubmissions();
+}
+
+function reject(i){
+  submissions[i].status='rejected';
+  localStorage.setItem('submissions', JSON.stringify(submissions));
+  renderSubmissions();
 }
