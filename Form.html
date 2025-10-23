@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Inscrição NzT</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script defer src="scripts.js"></script>
+</head>
+<body>
+  <main class="container">
+    <h1>Inscrição - NzT</h1>
+    <p>Preencha o formulário abaixo. Após enviar, você receberá um código (submissionId) para acompanhar o status.</p>
+
+    <form id="nzt-form">
+      <label>Qual seu nome?<input name="name" required /></label>
+      <label>Qual seu Nick do Discord?<input name="discord" required /></label>
+      <label>Idade<input name="age" type="number" min="6" max="120" required /></label>
+      <label>Em quais horários você está disponível?<textarea name="availability" rows="3" required></textarea></label>
+      <label>Você participa de calls e tem disponibilidade para fazer vídeos?<select name="calls" required>
+        <option value="">-- escolha --</option>
+        <option value="Sim">Sim</option>
+        <option value="Não">Não</option>
+        <option value="Às vezes">Às vezes</option>
+      </select></label>
+      <label class="rules"><input name="agree" type="checkbox" required /> Li e aceito as regras da NzT</label>
+      <button type="submit">Enviar inscrição</button>
+    </form>
+
+    <div id="result" class="hidden"></div>
+
+    <hr />
+    <h2>Verificar status da inscrição</h2>
+    <p>Se você já enviou, cole seu <strong>submissionId</strong> aqui:</p>
+    <input id="checkId" placeholder="Cole aqui seu submissionId" />
+    <button id="btnCheck">Ver status</button>
+    <div id="statusResult" class="hidden"></div>
+  </main>
+</body>
+</html>
